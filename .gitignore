@@ -3,3 +3,4 @@ venv
 project_notes
 .qodo
 .env
+__pycache__
