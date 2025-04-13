@@ -1,0 +1,12 @@
+[tool.black]
+line-length = 88
+target-version = ['py311']
+include = '\.py$'
+exclude = '''
+/(
+    \.venv
+  | __pycache__
+  | dev_journal
+  | .DS_Store
+)/
+'''
