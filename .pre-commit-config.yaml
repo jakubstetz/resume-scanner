@@ -3,7 +3,6 @@ repos:
     rev: 25.1.0
     hooks:
       - id: black
-        args: [--diff]
         pass_filenames: true
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
