@@ -12,13 +12,15 @@ import torch
 import numpy as np
 
 # --- Load models once at module level ---
+# This NER model is lightweight and specifically tuned for résumé-style data.
 ner_model_name = "Jean-Baptiste/roberta-large-ner-english"
+# This similarity model is widely used and well-tested.
 similarity_model_name = "sentence-transformers/all-MiniLM-L6-v2"
+similarity_model = SentenceTransformer(similarity_model_name)
 
 ner_pipeline = pipeline(
     "ner", model=ner_model_name, tokenizer=ner_model_name, grouped_entities=True
 )
-similarity_model = SentenceTransformer(similarity_model_name)
 
 
 # --- Skill extraction using NER ---
@@ -27,6 +29,7 @@ def extract_skills(text: str) -> list[dict]:
     Extracts named entities from résumé text using a pretrained NER model.
     Returns a list of entities with labels and confidence scores.
     """
+    # No gradients since we are doing inference, not training.
     with torch.no_grad():
         entities = ner_pipeline(text)
     return entities
@@ -36,6 +39,7 @@ def extract_skills(text: str) -> list[dict]:
 def compute_similarity(resume_text: str, job_text: str) -> float:
     """
     Computes cosine similarity between résumé and job description embeddings.
+    Each text is embedded into a 768-dimensional vector.
     """
     embeddings = similarity_model.encode([resume_text, job_text])
     return float(
