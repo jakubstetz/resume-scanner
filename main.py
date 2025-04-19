@@ -6,6 +6,7 @@ and includes any routers or middleware for the application.
 """
 
 from fastapi import FastAPI, UploadFile, File
+from app.services.pdf_parser import extract_text
 
 app = FastAPI()
 
@@ -17,4 +18,8 @@ def root():
 
 @app.post("/upload")
 async def upload_resume(file: UploadFile = File(...)):
-    return {"filename": file.filename}
+    text = extract_text(file)
+    return {
+        "filename": file.filename,
+        "text": text[:1000],
+    }  # return first 1000 chars as a preview
