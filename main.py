@@ -7,6 +7,7 @@ and includes any routers or middleware for the application.
 
 from fastapi import FastAPI, UploadFile, File
 from app.services.pdf_parser import extract_text
+from app.services.ai_engine import extract_skills, compute_similarity
 
 app = FastAPI()
 
@@ -34,3 +35,13 @@ async def upload_job(
         return {"job_text": job_text}
     else:
         return {"error": "Either a job file or job text must be provided."}
+
+
+@app.post("/analyze")
+async def analyze_resume(
+    resume_text: str = Form(...),
+    job_text: str = Form(...),
+):
+    skills = extract_skills(resume_text)
+    similarity = compute_similarity(resume_text, job_text)
+    return {"skills": skills, "similarity": similarity}
