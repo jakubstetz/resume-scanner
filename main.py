@@ -16,10 +16,21 @@ def root():
     return {"message": "Resume Scanner API"}
 
 
-@app.post("/upload")
-async def upload_resume(file: UploadFile = File(...)):
-    text = extract_text(file)
-    return {
-        "filename": file.filename,
-        "text": text[:1000],
-    }  # return first 1000 chars as a preview
+@app.post("/upload-resume")
+async def upload_resume(resume: UploadFile = File(...)):
+    resume_text = extract_text(resume)
+    return {"resume_text": resume_text}
+
+
+@app.post("/upload-job")
+async def upload_job(
+    job: UploadFile = File(None),
+    job_text: str = Form(None),
+):
+    if job:
+        job_text_extracted = extract_text(job)
+        return {"job_text": job_text_extracted}
+    elif job_text:
+        return {"job_text": job_text}
+    else:
+        return {"error": "Either a job file or job text must be provided."}
