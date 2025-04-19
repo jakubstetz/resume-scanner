@@ -1,3 +1,10 @@
+"""
+Handles PDF parsing and text extraction using pdfplumber.
+
+This module provides utility functions to extract raw text from
+PDF résumé files for further processing by downstream AI models.
+"""
+
 import pdfplumber
 
 
