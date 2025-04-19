@@ -1,10 +1,13 @@
-from fastapi import FastAPI
-from app.routes import router
+from fastapi import FastAPI, UploadFile, File
 
 app = FastAPI()
-app.include_router(router)
 
 
 @app.get("/")
 def root():
     return {"message": "Resume Scanner API"}
+
+
+@app.post("/upload")
+async def upload_resume(file: UploadFile = File(...)):
+    return {"filename": file.filename}
