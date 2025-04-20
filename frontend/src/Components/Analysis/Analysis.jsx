@@ -1,8 +1,10 @@
+
 function Analysis() {
   return (
-    <>
-      <div></div>
-    </>
+    <div className="analysis-section">
+      <h2>Analysis Results</h2>
+      <p>[Your results will appear here...]</p>
+    </div>
   );
 }
 
