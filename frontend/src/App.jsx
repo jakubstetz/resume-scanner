@@ -9,11 +9,23 @@ function App() {
   const [jobUploaded, setJobUploaded] = useState(false);
   const [showResults, setShowResults] = useState(false);
 
+  const handleUpload = async (file, type, onSuccess) => {
+    const formData = new FormData();
+    formData.append(type, file);
+
+    await fetch(`http://localhost:8000/upload-${type}`, {
+      method: "POST",
+      body: formData,
+    });
+
+    onSuccess();
+  };
+
   return (
     <div className="app-container">
       <Toaster />
-      <ResumeUpload uploadHandler={() => setResumeUploaded(true)} />
-      <JobUpload uploadHandler={() => setJobUploaded(true)} />
+      <ResumeUpload uploadHandler={(file) => handleUpload(file, "resume", () => setResumeUploaded(true))} />
+      <JobUpload uploadHandler={(file) => handleUpload(file, "job", () => setJobUploaded(true))} />
       <button
         className="analyze-button"
         disabled={!(resumeUploaded && jobUploaded)}
