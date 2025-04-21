@@ -6,12 +6,20 @@ and includes any routers or middleware for the application.
 """
 
 from fastapi import FastAPI, UploadFile, File, Form
+from fastapi.middleware.cors import CORSMiddleware
 from app.services.pdf_parser import extract_text
 
 # from app.services.ai_engine import extract_skills, compute_similarity
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Replace "*" with specific origins if needed
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def root():
