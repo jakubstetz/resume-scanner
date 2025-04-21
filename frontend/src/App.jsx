@@ -5,7 +5,7 @@ import ResumeUpload from "./Components/ResumeUpload/ResumeUpload";
 import JobUpload from "./Components/JobUpload/JobUpload";
 import Analysis from "./Components/Analysis/Analysis";
 
-const apiUrl = import.meta.env.VITE_API_URL;
+const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
 function App() {
   const [resumeUploaded, setResumeUploaded] = useState(false);
@@ -20,7 +20,10 @@ function App() {
   });
   const [showResults, setShowResults] = useState(false);
 
-  const uploadHandler = async (file, type, uploadedStateSetter, contentStateSetter) => {
+  const uploadHandler = async (event, type, uploadedStateSetter, contentStateSetter) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
     const formData = new FormData();
     formData.append(type, file);
 
@@ -48,8 +51,8 @@ function App() {
   return (
     <div className="app-container">
       <Toaster />
-      <ResumeUpload uploadHandler={(file) => uploadHandler(file, "resume", setResumeUploaded, setResume)} />
-      <JobUpload uploadHandler={(file) => uploadHandler(file, "job", setJobUploaded, setJob)} />
+      <ResumeUpload uploadHandler={(e) => uploadHandler(e, "resume", setResumeUploaded, setResume)} />
+      <JobUpload uploadHandler={(e) => uploadHandler(e, "job", setJobUploaded, setJob)} />
       <button
         className="analyze-button"
         disabled={!(resumeUploaded && jobUploaded)}
