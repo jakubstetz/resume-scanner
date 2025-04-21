@@ -20,7 +20,7 @@ def root():
 @app.post("/upload-resume")
 async def upload_resume(resume: UploadFile = File(...)):
     resume_text = extract_text(resume)
-    return {"resume_text": resume_text}
+    return {"filename": resume.filename, "file-contents": resume_text}
 
 
 @app.post("/upload-job")
@@ -30,9 +30,9 @@ async def upload_job(
 ):
     if job:
         job_text_extracted = extract_text(job)
-        return {"job_text": job_text_extracted}
+        return {"filename": job.filename, "file-contents": job_text_extracted}
     elif job_text:
-        return {"job_text": job_text}
+        return {"filename": False, "file-contents": job_text}
     else:
         return {"error": "Either a job file or job text must be provided."}
 
