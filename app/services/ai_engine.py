@@ -6,6 +6,7 @@ inference tasks such as skill extraction, named entity recognition, and
 semantic similarity between résumé content and job descriptions.
 """
 
+'''
 from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
 from sentence_transformers import SentenceTransformer
 import torch
@@ -46,3 +47,4 @@ def compute_similarity(resume_text: str, job_text: str) -> float:
         np.dot(embeddings[0], embeddings[1])
         / (np.linalg.norm(embeddings[0]) * np.linalg.norm(embeddings[1]))
     )
+'''
