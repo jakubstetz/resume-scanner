@@ -5,7 +5,7 @@ This file initializes the FastAPI app instance, defines the root endpoint,
 and includes any routers or middleware for the application.
 """
 
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Form
 from app.services.pdf_parser import extract_text
 
 # from app.services.ai_engine import extract_skills, compute_similarity
