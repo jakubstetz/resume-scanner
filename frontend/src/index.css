@@ -1,4 +1,3 @@
-
 body {
 margin: 0;
 font-family: Arial, sans-serif;
@@ -23,6 +22,46 @@ padding: 1.5rem;
 border-radius: 12px;
 width: 100%;
 box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Analysis Section */
+.analysis-section {
+  background-color: #1e293b; /* Matches the upload-section background */
+  padding: 1.5rem;
+  border-radius: 12px;
+  width: 100%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  color: #f8fafc; /* Matches the text color */
+}
+
+.analysis-section h2 {
+  margin-top: 0;
+  font-size: 1.5rem;
+  color: #f8fafc;
+}
+
+.analysis-section h3 {
+  margin-top: 1rem;
+  font-size: 1.25rem;
+  color: #22c55e; /* Accent color for headings */
+}
+
+.analysis-section ul {
+  list-style-type: disc;
+  margin-left: 1.5rem;
+  padding-left: 0.5rem;
+}
+
+.analysis-section li {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  color: #f8fafc;
+}
+
+.analysis-section p {
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  color: #f8fafc;
 }
 
 .upload-section h2,
