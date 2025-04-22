@@ -35,7 +35,14 @@ def extract_skills(text: str) -> list[dict]:
     # No gradients since we are doing inference, not training.
     with torch.no_grad():
         entities = ner_pipeline(text)
-    return entities
+
+    def sanitize(entity):
+        return {
+            k: float(v) if isinstance(v, np.floating) else int(v) if isinstance(v, np.integer) else v
+            for k, v in entity.items()
+        }
+    
+    return [sanitize(e) for e in entities]
 
 
 # --- Semantic similarity scoring ---
