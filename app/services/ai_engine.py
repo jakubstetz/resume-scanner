@@ -6,17 +6,19 @@ inference tasks such as skill extraction, named entity recognition, and
 semantic similarity between résumé content and job descriptions.
 """
 
-'''
+
 from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
 from sentence_transformers import SentenceTransformer
 import torch
 import numpy as np
+import os
 
 # --- Load models once at module level ---
 # This NER model is lightweight and specifically tuned for résumé-style data.
-ner_model_name = "Jean-Baptiste/roberta-large-ner-english"
+ner_model_name = os.getenv("NER_MODEL")
+
 # This similarity model is widely used and well-tested.
-similarity_model_name = "sentence-transformers/all-MiniLM-L6-v2"
+similarity_model_name = os.getenv("SIMILARITY_MODEL")
 similarity_model = SentenceTransformer(similarity_model_name)
 
 ner_pipeline = pipeline(
@@ -47,4 +49,3 @@ def compute_similarity(resume_text: str, job_text: str) -> float:
         np.dot(embeddings[0], embeddings[1])
         / (np.linalg.norm(embeddings[0]) * np.linalg.norm(embeddings[1]))
     )
-'''
