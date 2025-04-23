@@ -33,13 +33,15 @@ def extract_skills(text: str) -> list[dict]:
     Extracts named entities from résumé text using a pretrained NER model.
     Returns a list of entities with labels and confidence scores.
     """
-    # No gradients since we are doing inference, not training.
-    with torch.no_grad():
-        raw_entities = ner_pipeline(text)
-    
-    filtered_entities = filter_skill_entities(raw_entities)
-    
-    return [sanitize_entity(e) for e in filtered_entities]
+
+    try:
+        # No gradients since we are doing inference, not training.
+        with torch.no_grad():
+            raw_entities = ner_pipeline(text)
+        filtered_entities = filter_skill_entities(raw_entities)
+        return [sanitize_entity(e) for e in filtered_entities]
+    except Exception as e:
+        raise ValueError(f"NER model inference failed: {str(e)}")
 
 
 # --- Semantic similarity scoring ---
