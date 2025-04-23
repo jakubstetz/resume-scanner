@@ -45,14 +45,27 @@ async def upload_job(
     job: UploadFile = File(None),
     job_text: str = Form(None),
 ):
+    # File upload
     if job:
-        job_text_extracted = extract_text(job)
-        return {"filename": job.filename, "content": job_text_extracted}
+        try:
+            job_text_extracted = extract_text(job)
+            return {"filename": job.filename, "content": job_text_extracted}
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+        except Exception as e:
+            # Generic fallback (e.g. file encoding error)
+            raise HTTPException(status_code=500, detail="Unexpected error parsing job PDF.")
+    
+    # Text submission
     elif job_text:
         return {"filename": False, "content": job_text}
+    
+    # Neither
     else:
-        return {"error": "Either a job file or job text must be provided."}
-
+        raise HTTPException(
+            status_code=422,
+            detail="Either a job file or pasted job text must be provided."
+        )
 
 
 @app.post("/analyze")
