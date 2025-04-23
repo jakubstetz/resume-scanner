@@ -18,7 +18,7 @@ function Analysis({ analysisResults }) {
         <ul>
           {skills.map((skill, index) => (
             <li key={index}>
-              {skill.entity} (Confidence: {(skill.score * 100).toFixed(2)}%)
+              {skill.word} (Confidence: {(skill.score * 100).toFixed(2)}%)
             </li>
           ))}
         </ul>
