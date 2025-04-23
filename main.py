@@ -73,6 +73,12 @@ async def analyze_resume(
     resume_text: str = Body(...),
     job_text: str = Body(...),
 ):
-    skills = extract_skills(resume_text)
-    similarity = compute_similarity(resume_text, job_text)
-    return {"skills": skills, "similarity": similarity}
+    if not resume_text or not job_text:
+        raise HTTPException(status_code=422, detail="Resume or job text is missing.")
+    
+    try:
+        skills = extract_skills(resume_text)
+        similarity = compute_similarity(resume_text, job_text)
+        return {"skills": skills, "similarity": similarity}
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
