@@ -9,7 +9,7 @@ and includes any routers or middleware for the application.
 from dotenv import load_dotenv
 load_dotenv()
 
-from fastapi import FastAPI, UploadFile, File, Form, Body
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Body
 from fastapi.middleware.cors import CORSMiddleware
 from app.services.pdf_parser import extract_text
 from app.services.ai_engine import extract_skills, compute_similarity
@@ -33,8 +33,11 @@ def root():
 
 @app.post("/upload-resume")
 async def upload_resume(resume: UploadFile = File(...)):
-    resume_text = extract_text(resume)
-    return {"filename": resume.filename, "content": resume_text}
+    try:
+        resume_text = extract_text(resume)
+        return {"filename": resume.filename, "content": resume_text}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.post("/upload-job")

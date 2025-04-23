@@ -9,7 +9,10 @@ import pdfplumber
 
 
 def extract_text(file):
-    with pdfplumber.open(file.file) as pdf:
-        return "\n".join(
-            page.extract_text() for page in pdf.pages if page.extract_text()
-        )
+    try:
+        with pdfplumber.open(file.file) as pdf:
+            return "\n".join(
+                page.extract_text() for page in pdf.pages if page.extract_text()
+            )
+    except Exception as e:
+        raise ValueError(f"Failed to extract text from PDF: {str(e)}")
