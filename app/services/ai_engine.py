@@ -50,8 +50,19 @@ def compute_similarity(resume_text: str, job_text: str) -> float:
     Computes cosine similarity between résumé and job description embeddings.
     Each text is embedded into a 768-dimensional vector.
     """
-    embeddings = similarity_model.encode([resume_text, job_text])
-    return float(
-        np.dot(embeddings[0], embeddings[1])
-        / (np.linalg.norm(embeddings[0]) * np.linalg.norm(embeddings[1]))
-    )
+    try:
+        embeddings = similarity_model.encode([resume_text, job_text])
+        
+        if not all(len(vec) > 0 for vec in embeddings):
+            raise ValueError("Embedding failed: one or both texts returned empty vectors.")
+        
+        dot_product = np.dot(embeddings[0], embeddings[1])
+        norm_product = np.linalg.norm(embeddings[0]) * np.linalg.norm(embeddings[1])
+
+        if norm_product == 0:
+            raise ValueError("Invalid input: cannot compute similarity with zero-vector embeddings.")
+
+        return float(dot_product / norm_product)
+
+    except Exception as e:
+        raise ValueError(f"Similarity computation failed: {str(e)}")
