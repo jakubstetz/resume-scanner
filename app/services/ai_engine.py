@@ -12,7 +12,7 @@ from sentence_transformers import SentenceTransformer
 import torch
 import numpy as np
 import os
-from app.utils import filter_skill_entities
+from app.utils import filter_skill_entities, sanitize_entity
 
 # --- Load models once at module level ---
 # This NER model is lightweight and specifically tuned for résumé-style data.
@@ -38,19 +38,8 @@ def extract_skills(text: str) -> list[dict]:
         raw_entities = ner_pipeline(text)
     
     filtered_entities = filter_skill_entities(raw_entities)
-
-    def sanitize(entity):
-        """
-        Converts all NumPy numeric types in the NER output to native Python types.
-        This is necessary because FastAPI's JSON encoder cannot serialize np.float32 or np.int32 objects.
-        Without this, returning the 'skills' list in an API response can raise a serialization error.
-        """
-        return {
-            k: float(v) if isinstance(v, np.floating) else int(v) if isinstance(v, np.integer) else v
-            for k, v in entity.items()
-        }
     
-    return [sanitize(e) for e in filtered_entities]
+    return [sanitize_entity(e) for e in filtered_entities]
 
 
 # --- Semantic similarity scoring ---
