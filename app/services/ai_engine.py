@@ -12,6 +12,7 @@ from sentence_transformers import SentenceTransformer
 import torch
 import numpy as np
 import os
+from app.utils import filter_skill_entities
 
 # --- Load models once at module level ---
 # This NER model is lightweight and specifically tuned for résumé-style data.
@@ -34,7 +35,9 @@ def extract_skills(text: str) -> list[dict]:
     """
     # No gradients since we are doing inference, not training.
     with torch.no_grad():
-        entities = ner_pipeline(text)
+        raw_entities = ner_pipeline(text)
+    
+    filtered_entities = filter_skill_entities(raw_entities)
 
     def sanitize(entity):
         """
@@ -47,7 +50,7 @@ def extract_skills(text: str) -> list[dict]:
             for k, v in entity.items()
         }
     
-    return [sanitize(e) for e in entities]
+    return [sanitize(e) for e in filtered_entities]
 
 
 # --- Semantic similarity scoring ---
