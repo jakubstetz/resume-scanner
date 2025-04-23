@@ -73,7 +73,6 @@ function App() {
 
       if (api_response.ok) {
         const results = await api_response.json();
-        console.log(results)
         setAnalysisResults(results);
         setShowResults(true);
         toast.success("Analysis completed successfully!");
