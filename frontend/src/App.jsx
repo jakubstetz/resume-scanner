@@ -47,9 +47,13 @@ function App() {
       toast.dismiss();
       if (api_response.ok) {
         const uploaded_object = await api_response.json();
-        uploadedStateSetter(true);
-        contentStateSetter(uploaded_object);
-        toast.success(`${type} uploaded successfully!`);
+        if (uploaded_object?.filename && uploaded_object?.content) {
+          uploadedStateSetter(true);
+          contentStateSetter(uploaded_object);
+          toast.success(`${type} uploaded successfully!`);
+        } else {
+          toast.error(`${type} upload failed: Malformed API response.`);
+        }
       } else {
         const error = await api_response.json();
         console.log(error);
@@ -57,6 +61,7 @@ function App() {
       }
     } catch (err) {
       console.error(err);
+      toast.error("An error occurred during analysis.");
     }
   };
 
