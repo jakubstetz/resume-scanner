@@ -1,0 +1,12 @@
+node_modules
+dist
+build
+.venv
+__pycache__
+*.log
+*.py
+.github
+archive
+.husky
+dev_journal
+.DS_Store
