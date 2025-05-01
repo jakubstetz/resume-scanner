@@ -1,4 +1,3 @@
-
 function ResumeUpload({ uploadHandler }) {
   return (
     <div className="upload-section">

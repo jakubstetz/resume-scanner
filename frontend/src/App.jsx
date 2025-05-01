@@ -11,14 +11,14 @@ function App() {
   const [resumeUploaded, setResumeUploaded] = useState(false);
   const [resume, setResume] = useState({
     filename: "",
-    content: ""
+    content: "",
   });
   const [jobUploaded, setJobUploaded] = useState(false);
   const [job, setJob] = useState({
     filename: "",
-    content: ""
+    content: "",
   });
-  const [analysisResults, setAnalysisResults] = useState(false)
+  const [analysisResults, setAnalysisResults] = useState(false);
   const [showResults, setShowResults] = useState(false);
 
   /*
@@ -32,7 +32,12 @@ function App() {
   }, [job, resume]);
   */
 
-  const uploadHandler = async (event, type, uploadedStateSetter, contentStateSetter) => {
+  const uploadHandler = async (
+    event,
+    type,
+    uploadedStateSetter,
+    contentStateSetter,
+  ) => {
     const file = event.target.files[0];
     if (!file) return;
 
@@ -95,8 +100,14 @@ function App() {
   return (
     <div className="app-container">
       <Toaster />
-      <ResumeUpload uploadHandler={(e) => uploadHandler(e, "resume", setResumeUploaded, setResume)} />
-      <JobUpload uploadHandler={(e) => uploadHandler(e, "job", setJobUploaded, setJob)} />
+      <ResumeUpload
+        uploadHandler={(e) =>
+          uploadHandler(e, "resume", setResumeUploaded, setResume)
+        }
+      />
+      <JobUpload
+        uploadHandler={(e) => uploadHandler(e, "job", setJobUploaded, setJob)}
+      />
       <button
         className="analyze-button"
         disabled={!(resumeUploaded && jobUploaded)}
