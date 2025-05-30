@@ -1,6 +1,6 @@
 **/.DS_Store
 .venv
-.env
+/.env
 __pycache__
 dev_journal
 
