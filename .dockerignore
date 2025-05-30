@@ -1,0 +1,16 @@
+__pycache__
+.github
+.husky
+.venv
+frontend
+.cz.toml
+.DS_Store
+.env
+.env.docker
+.gitignore
+.gitlint
+.lintstagedrc
+.prettier-ignore
+package-lock.json
+package.json
+README.md
