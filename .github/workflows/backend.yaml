@@ -1,0 +1,42 @@
+name: Deploy Backend to EC2
+
+# Trigger this workflow on manual invocation or when main is pushed
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "**"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the code from the GitHub repo
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up SSH agent using the EC2 private key stored in GitHub Secrets
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+
+      # Step 3:
+      #   1) SSH into EC2 instance
+      #   2) Pull latest changes from main branch
+      #   3) Generate root .env file
+      #   4) Spin up Docker container
+      - name: SSH and Pull Repo
+        run: |
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} << EOF
+            cd resume-scanner
+            git pull origin main
+
+            echo "CORS_ORIGINS=${{ vars.FRONTEND_URL }}" > .env
+            echo "LIGHTWEIGHT_MODELS=${{ vars.LIGHTWEIGHT_MODELS }}" >> .env
+
+            bash scripts/docker-deploy.sh
+          EOF
