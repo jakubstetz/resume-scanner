@@ -44,6 +44,7 @@ function App() {
     const formData = new FormData();
     formData.append(type, file);
 
+    const capitalizedType = type.charAt(0).toUpperCase() + type.slice(1);
     try {
       const api_response = await fetch(`${apiUrl}/upload-${type}`, {
         method: "POST",
@@ -55,14 +56,16 @@ function App() {
         if (uploaded_object?.filename && uploaded_object?.content) {
           uploadedStateSetter(true);
           contentStateSetter(uploaded_object);
-          toast.success(`${type} uploaded successfully!`);
+          toast.success(`${capitalizedType} uploaded successfully!`);
         } else {
-          toast.error(`${type} upload failed: Malformed API response.`);
+          toast.error(
+            `${capitalizedType} upload failed: Malformed API response.`,
+          );
         }
       } else {
         const error = await api_response.json();
         console.log(error);
-        toast.error(`${type} upload failed.`);
+        toast.error(`${capitalizedType} upload failed.`);
       }
     } catch (err) {
       console.error(err);
