@@ -6,7 +6,6 @@ inference tasks such as skill extraction, named entity recognition, and
 semantic similarity between résumé content and job descriptions.
 """
 
-
 from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
 from sentence_transformers import SentenceTransformer
 import torch
@@ -15,11 +14,16 @@ import os
 from app.utils import filter_skill_entities, sanitize_entity
 
 # --- Load models once at module level ---
-# This NER model is lightweight and specifically tuned for résumé-style data.
-ner_model_name = os.getenv("NER_MODEL")
+# Use lightweight models if specified in environment
+use_lightweight_models = os.getenv("LIGHTWEIGHT_MODELS", "false").lower() == "true"
 
-# This similarity model is widely used and well-tested.
-similarity_model_name = os.getenv("SIMILARITY_MODEL")
+if use_lightweight_models:  # Used primarily for demo hosting with constrained resources
+    ner_model_name = "dslim/bert-base-NER"
+    similarity_model_name = "sentence-transformers/all-MiniLM-L6-v2"
+else:  # Full-powered local development or production
+    ner_model_name = "Jean-Baptiste/roberta-large-ner-english"
+    similarity_model_name = "sentence-transformers/all-MiniLM-L6-v2"
+
 similarity_model = SentenceTransformer(similarity_model_name)
 
 ner_pipeline = pipeline(
@@ -52,15 +56,19 @@ def compute_similarity(resume_text: str, job_text: str) -> float:
     """
     try:
         embeddings = similarity_model.encode([resume_text, job_text])
-        
+
         if not all(len(vec) > 0 for vec in embeddings):
-            raise ValueError("Embedding failed: one or both texts returned empty vectors.")
-        
+            raise ValueError(
+                "Embedding failed: one or both texts returned empty vectors."
+            )
+
         dot_product = np.dot(embeddings[0], embeddings[1])
         norm_product = np.linalg.norm(embeddings[0]) * np.linalg.norm(embeddings[1])
 
         if norm_product == 0:
-            raise ValueError("Invalid input: cannot compute similarity with zero-vector embeddings.")
+            raise ValueError(
+                "Invalid input: cannot compute similarity with zero-vector embeddings."
+            )
 
         return float(dot_product / norm_product)
 
