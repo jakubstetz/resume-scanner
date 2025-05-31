@@ -29,7 +29,7 @@ jobs:
       #   2) Pull latest changes from main branch
       #   3) Generate root .env file
       #   4) Spin up Docker container
-      - name: SSH and Pull Repo
+      - name: Deploy backend
         run: |
           ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} << EOF
             cd resume-scanner
