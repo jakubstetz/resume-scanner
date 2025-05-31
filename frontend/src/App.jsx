@@ -5,7 +5,7 @@ import ResumeUpload from "./Components/ResumeUpload/ResumeUpload";
 import JobUpload from "./Components/JobUpload/JobUpload";
 import Analysis from "./Components/Analysis/Analysis";
 
-const apiUrl = import.meta.env.VITE_API_BASE_URL;
+const apiUrl = import.meta.env.VITE_API_URL;
 
 function App() {
   const [resumeUploaded, setResumeUploaded] = useState(false);
