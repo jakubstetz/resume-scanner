@@ -6,7 +6,7 @@ inference tasks such as skill extraction, named entity recognition, and
 semantic similarity between résumé content and job descriptions.
 """
 
-from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
+from transformers import pipeline
 from sentence_transformers import SentenceTransformer
 import torch
 import numpy as np
