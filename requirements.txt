@@ -40,7 +40,6 @@ pdfminer.six==20250327
 pdfplumber==0.11.6
 pillow==11.1.0
 platformdirs==4.3.7
-pre_commit==4.2.0
 prompt_toolkit==3.0.50
 psycopg==3.2.6
 psycopg-binary==3.2.6
