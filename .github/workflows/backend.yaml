@@ -27,16 +27,19 @@ jobs:
       # Step 3:
       #   1) SSH into EC2 instance
       #   2) Pull latest changes from main branch
-      #   3) Generate root .env file
-      #   4) Spin up Docker container
+      #   3) Remove unnecessary frontend directory
+      #   4) Generate root .env file
+      #   5) Spin up Docker container
       - name: Deploy backend
         run: |
           ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} << EOF
             cd resume-scanner
             git pull origin main
 
+            rm -rf frontend
+
             echo "CORS_ORIGINS=${{ vars.FRONTEND_URL }}" > .env
             echo "LIGHTWEIGHT_MODELS=${{ vars.LIGHTWEIGHT_MODELS }}" >> .env
 
-            bash scripts/docker-deploy.sh
+            bash scripts/docker-lightweight-deploy.sh
           EOF
