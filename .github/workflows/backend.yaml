@@ -41,5 +41,5 @@ jobs:
             echo "CORS_ORIGINS=${{ vars.FRONTEND_URL }}" > .env
             echo "LIGHTWEIGHT_MODELS=${{ vars.LIGHTWEIGHT_MODELS }}" >> .env
 
-            bash scripts/docker-lightweight-deploy.sh
+            bash scripts/docker-backend-deploy.sh
           EOF
