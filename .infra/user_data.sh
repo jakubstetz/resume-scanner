@@ -17,10 +17,11 @@ git clone https://github.com/jakubstetz/resume-scanner.git
 
 # NGINX reverse proxy setup
 cd resume-scanner/.infra
-cp nginx_resume_scanner.conf /etc/nginx/conf.d/resume-scanner.conf
+cp nginx_resume-scanner.conf /etc/nginx/conf.d/resume-scanner.conf
 sudo systemctl restart nginx
 
 # Wait for DNS to propagate
+# (Certbot setup will fail if DNS has not yet propagated)
 until host api.resume-scanner.jakubstetz.dev; do
   echo "⏳ Waiting for DNS...";
   sleep 10;
