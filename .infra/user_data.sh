@@ -20,16 +20,11 @@ cd resume-scanner/.infra
 cp nginx_resume-scanner.conf /etc/nginx/conf.d/resume-scanner.conf
 sudo systemctl restart nginx
 
-# Wait for DNS to propagate
-# (Certbot setup will fail if DNS has not yet propagated)
-until host api.resume-scanner.jakubstetz.dev; do
-  echo "⏳ Waiting for DNS...";
-  sleep 10;
-done
-
-# Set up SSL with Certbot
-dnf install -y certbot python3-certbot-nginx
-certbot --nginx -d api.resume-scanner.jakubstetz.dev
+# Certbot setup information message
+echo ""
+echo "Because first-time use of Certbot requires user interaction, SSL setup with Certbot is not included as a part of this script. See SETUP.md for how to set up SSL using Certbot."
 
 # Completion message
+echo ""
 echo "✅ EC2 setup complete. Run backend.yaml workflow in GitHub Actions to deploy backend, and then visit https://api.resume-scanner.jakubstetz.dev/health to check system health."
+echo ""
