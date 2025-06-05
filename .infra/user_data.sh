@@ -2,6 +2,12 @@
 # This script runs automatically when EC2 instance boots if provided as User Data
 # It sets up the EC2 instance with everything needed to deploy the backend with domain and HTTPS routing
 
+# Wait until network connectivity is established
+until ping -c1 github.com &>/dev/null; do
+  echo "Waiting for network..."
+  sleep 5
+done
+
 # System prep
 dnf update -y
 dnf install -y git nginx docker python3-pip
