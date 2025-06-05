@@ -99,6 +99,9 @@ sudo dnf install -y certbot python3-certbot-nginx
 sudo certbot --nginx -d api.resume-scanner.jakubstetz.dev
 ```
 
+> Note:
+> First-time use of Certbot requires manual input of your email for notifications, as well as acceptance of terms of service and agreement/disagreement to share address with the Electronic Frontier Foundation.
+
 ---
 
 ## 📂 `.infra` Folder Structure Overview
