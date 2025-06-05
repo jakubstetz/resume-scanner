@@ -54,7 +54,7 @@ Log out and back in to apply Docker group permissions.
 
 ---
 
-## 🐳 2. Clone and Build the Project
+## 🧬 2. Clone the Project Repository
 
 ```bash
 git clone https://github.com/jakubstetz/resume-scanner.git
