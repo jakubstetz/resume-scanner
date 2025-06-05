@@ -68,7 +68,7 @@ Once the project is cloned onto the EC2 instance, running the "Deploy Backend to
 
 If you want to connect to the backend through a domain, execute the following steps.
 
-1. Save the config file `.infra/nginx_resume_scanner.conf` to:
+1. Save the config file `.infra/nginx_resume-scanner.conf` to:
 
 ```bash
 /etc/nginx/conf.d/resume-scanner.conf
@@ -107,5 +107,5 @@ sudo certbot --nginx -d api.resume-scanner.jakubstetz.dev
 ## 📂 `.infra` Folder Structure Overview
 
 - `.infra/SETUP.md` — this setup guide.
-- `.infra/nginx_resume_scanner.conf` — template for NGINX reverse proxy (uses domain `api.resume-scanner.jakubstetz.dev`).
+- `.infra/nginx_resume-scanner.conf` — template for NGINX reverse proxy (uses domain `api.resume-scanner.jakubstetz.dev`).
 - `.infra/user_data.sh` — optional EC2 user-data script to automate instance setup.
