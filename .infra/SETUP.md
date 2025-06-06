@@ -80,7 +80,13 @@ If you want to connect to the backend through a domain, execute the following st
 > Then, run the command `cat /etc/nginx/nginx.conf | grep include`. If the output contains a line like the following, then the above location is correct:
 > `include /etc/nginx/conf.d/*.conf;`
 
-2. Restart NGINX:
+2. Enable automatic restart of NGINX on system reboot:
+
+```bash
+sudo systemctl enable nginx
+```
+
+3. Restart NGINX:
 
 ```bash
 sudo systemctl restart nginx

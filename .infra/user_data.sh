@@ -24,7 +24,8 @@ git clone https://github.com/jakubstetz/resume-scanner.git
 # NGINX reverse proxy setup
 cd resume-scanner/.infra
 cp nginx_resume-scanner.conf /etc/nginx/conf.d/resume-scanner.conf
-sudo systemctl restart nginx
+systemctl enable nginx
+systemctl restart nginx
 
 # Certbot setup information message
 echo ""
