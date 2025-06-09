@@ -80,8 +80,9 @@ body {
   color: #f8fafc;
 }
 
-.file-input::-webkit-file-upload-button,
-.file-input::file-selector-button {
+.text-submit-button,
+input::-webkit-file-upload-button,
+input::file-selector-button {
   background-color: #2b6bd1;
   border-radius: 12px;
   padding: 0.5rem 0.75rem;
@@ -94,14 +95,16 @@ body {
     box-shadow 0.2s;
 }
 
-.file-input::-webkit-file-upload-button:hover,
-.file-input::file-selector-button:hover {
+.text-submit-button:hover,
+input::-webkit-file-upload-button:hover,
+input::file-selector-button:hover {
   background-color: #3b82f6;
   box-shadow: 0 2px 8px rgba(59, 130, 246, 0.08);
 }
 
-.file-input::-webkit-file-upload-button:active,
-.file-input::file-selector-button:active {
+.text-submit-button:active,
+input::-webkit-file-upload-button:active,
+input::file-selector-button:active {
   background-color: #2563eb;
   box-shadow: 0 1px 4px rgba(37, 99, 235, 0.12);
 }

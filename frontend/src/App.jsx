@@ -14,6 +14,7 @@ function App() {
     content: "",
   });
   const [jobUploaded, setJobUploaded] = useState(false);
+  const [jobTextUploaded, setJobTextUploaded] = useState(false);
   const [job, setJob] = useState({
     filename: "",
     content: "",
@@ -100,6 +101,36 @@ function App() {
     }
   };
 
+  const handleJobTextSubmit = async (text) => {
+    try {
+      const api_response = await fetch(`${apiUrl}/upload-job`, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ job_text: text }),
+      });
+      if (api_response.ok) {
+        const uploaded_object = await api_response.json();
+        if (uploaded_object?.content) {
+          setJobTextUploaded(true);
+          setJob((prev) => ({
+            ...prev,
+            content: uploaded_object.content,
+          }));
+          toast.success("Job description text submitted successfully!");
+        } else {
+          toast.error("Job text submission failed: Malformed API response.");
+        }
+      } else {
+        const error = await api_response.json();
+        console.log(error);
+        toast.error("Job text submission failed.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("An error occurred during job text submission.");
+    }
+  };
+
   return (
     <div className="app-container">
       <Toaster />
@@ -113,11 +144,13 @@ function App() {
       <JobUpload
         uploadHandler={(e) => uploadHandler(e, "job", setJobUploaded, setJob)}
         uploaded={jobUploaded}
+        textUploaded={jobTextUploaded}
         filename={job.filename}
+        onTextSubmit={handleJobTextSubmit}
       />
       <button
         className="analyze-button"
-        disabled={!(resumeUploaded && jobUploaded)}
+        disabled={!(resumeUploaded && (jobUploaded || jobTextUploaded))}
         onClick={analyzeHandler}
       >
         Analyze
