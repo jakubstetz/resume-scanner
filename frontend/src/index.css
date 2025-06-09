@@ -89,6 +89,21 @@ body {
   color: white;
   cursor: pointer;
   margin-right: 0.5rem;
+  transition:
+    background-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.file-input::-webkit-file-upload-button:hover,
+.file-input::file-selector-button:hover {
+  background-color: #3b82f6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.08);
+}
+
+.file-input::-webkit-file-upload-button:active,
+.file-input::file-selector-button:active {
+  background-color: #2563eb;
+  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.12);
 }
 
 .text-input {
