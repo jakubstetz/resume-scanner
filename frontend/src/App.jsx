@@ -107,9 +107,13 @@ function App() {
         uploadHandler={(e) =>
           uploadHandler(e, "resume", setResumeUploaded, setResume)
         }
+        uploaded={resumeUploaded}
+        filename={resume.filename}
       />
       <JobUpload
         uploadHandler={(e) => uploadHandler(e, "job", setJobUploaded, setJob)}
+        uploaded={jobUploaded}
+        filename={job.filename}
       />
       <button
         className="analyze-button"
