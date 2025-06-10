@@ -28,7 +28,6 @@ function JobUpload({
         className="text-submit-button"
         style={{ marginTop: 8, marginBottom: 0 }}
         onClick={handleTextSubmit}
-        disabled={!text.trim()}
       >
         Submit Text
       </button>

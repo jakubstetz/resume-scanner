@@ -88,14 +88,18 @@ function App() {
   };
 
   const handleJobTextSubmit = (text) => {
-    setJobTextUploaded(true);
+    setJobTextUploaded(!!text.trim());
     setJob((prev) => ({
-      ...prev, // Retain the file content if it exists
+      ...prev,
       text: {
         content: text,
       },
     }));
-    toast.success("Job description text submitted successfully!");
+    toast.success(
+      text.trim()
+        ? "Job description text submitted successfully!"
+        : "Job description text cleared.",
+    );
   };
 
   const analyzeHandler = async () => {
