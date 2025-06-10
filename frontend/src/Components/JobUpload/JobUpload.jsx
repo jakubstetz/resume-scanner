@@ -1,4 +1,4 @@
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";
 
 function JobUpload({
@@ -37,38 +37,50 @@ function JobUpload({
         Submit Text
       </button>
       <div style={{ minHeight: 24, display: "flex", alignItems: "center" }}>
-        {uploaded && textUploaded ? (
-          <motion.span
-            className="upload-status"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            ✅ Both file ({filename}) and text submitted
-          </motion.span>
-        ) : uploaded ? (
-          <motion.span
-            className="upload-status"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            ✅ Uploaded: {filename}
-          </motion.span>
-        ) : textUploaded ? (
-          <motion.span
-            className="upload-status"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            ✅ Text input received
-          </motion.span>
-        ) : (
-          <span style={{ opacity: 0 }} className="upload-status">
-            placeholder
-          </span>
-        )}
+        <AnimatePresence mode="wait">
+          {uploaded && textUploaded ? (
+            <motion.span
+              key="both"
+              className="upload-status"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+            >
+              ✅ Both file ({filename}) and text submitted
+            </motion.span>
+          ) : uploaded ? (
+            <motion.span
+              key="file"
+              className="upload-status"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+            >
+              ✅ Uploaded: {filename}
+            </motion.span>
+          ) : textUploaded ? (
+            <motion.span
+              key="text"
+              className="upload-status"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+            >
+              ✅ Text input received
+            </motion.span>
+          ) : (
+            <motion.span
+              key="placeholder"
+              style={{ opacity: 0 }}
+              className="upload-status"
+            >
+              placeholder
+            </motion.span>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
