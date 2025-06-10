@@ -37,7 +37,16 @@ function JobUpload({
         Submit Text
       </button>
       <div style={{ minHeight: 24, display: "flex", alignItems: "center" }}>
-        {uploaded ? (
+        {uploaded && textUploaded ? (
+          <motion.span
+            className="upload-status"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            ✅ Both file ({filename}) and text submitted
+          </motion.span>
+        ) : uploaded ? (
           <motion.span
             className="upload-status"
             initial={{ opacity: 0 }}
