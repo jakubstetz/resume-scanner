@@ -10,14 +10,21 @@ const apiUrl = import.meta.env.VITE_API_URL;
 function App() {
   const [resumeUploaded, setResumeUploaded] = useState(false);
   const [resume, setResume] = useState({
-    filename: "",
-    content: "",
+    file: {
+      filename: "",
+      content: "",
+    },
   });
   const [jobUploaded, setJobUploaded] = useState(false);
   const [jobTextUploaded, setJobTextUploaded] = useState(false);
   const [job, setJob] = useState({
-    filename: "",
-    content: "",
+    file: {
+      filename: "",
+      content: "",
+    },
+    text: {
+      content: "",
+    },
   });
   const [analysisResults, setAnalysisResults] = useState(false);
   const [showResults, setShowResults] = useState(false);
@@ -56,7 +63,13 @@ function App() {
         const uploaded_object = await api_response.json();
         if (uploaded_object?.filename && uploaded_object?.content) {
           uploadedStateSetter(true);
-          contentStateSetter(uploaded_object);
+          contentStateSetter((prev) => ({
+            ...prev,
+            file: {
+              filename: uploaded_object.filename,
+              content: uploaded_object.content,
+            },
+          }));
           toast.success(`${capitalizedType} uploaded successfully!`);
         } else {
           toast.error(
@@ -74,14 +87,28 @@ function App() {
     }
   };
 
+  const handleJobTextSubmit = (text) => {
+    setJobTextUploaded(true);
+    setJob((prev) => ({
+      ...prev, // Retain the file content if it exists
+      text: {
+        content: text,
+      },
+    }));
+    toast.success("Job description text submitted successfully!");
+  };
+
   const analyzeHandler = async () => {
     try {
+      // For now, prioritize file content over text content
+      const jobContent = job.file.content || job.text.content;
+
       const api_response = await fetch(`${apiUrl}/analyze`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          resume_text: resume.content,
-          job_text: job.content,
+          resume_text: resume.file.content,
+          job_text: jobContent,
         }),
       });
 
@@ -101,36 +128,6 @@ function App() {
     }
   };
 
-  const handleJobTextSubmit = async (text) => {
-    try {
-      const api_response = await fetch(`${apiUrl}/upload-job`, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ job_text: text }),
-      });
-      if (api_response.ok) {
-        const uploaded_object = await api_response.json();
-        if (uploaded_object?.content) {
-          setJobTextUploaded(true);
-          setJob((prev) => ({
-            ...prev,
-            content: uploaded_object.content,
-          }));
-          toast.success("Job description text submitted successfully!");
-        } else {
-          toast.error("Job text submission failed: Malformed API response.");
-        }
-      } else {
-        const error = await api_response.json();
-        console.log(error);
-        toast.error("Job text submission failed.");
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("An error occurred during job text submission.");
-    }
-  };
-
   return (
     <div className="app-container">
       <Toaster />
@@ -139,13 +136,13 @@ function App() {
           uploadHandler(e, "resume", setResumeUploaded, setResume)
         }
         uploaded={resumeUploaded}
-        filename={resume.filename}
+        filename={resume.file.filename}
       />
       <JobUpload
         uploadHandler={(e) => uploadHandler(e, "job", setJobUploaded, setJob)}
         uploaded={jobUploaded}
         textUploaded={jobTextUploaded}
-        filename={job.filename}
+        filename={job.file.filename}
         onTextSubmit={handleJobTextSubmit}
       />
       <button

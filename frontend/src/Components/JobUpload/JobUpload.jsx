@@ -11,11 +11,7 @@ function JobUpload({
   const [text, setText] = useState("");
 
   const handleTextChange = (e) => setText(e.target.value);
-  const handleTextSubmit = () => {
-    if (text.trim()) {
-      onTextSubmit(text);
-    }
-  };
+  const handleTextSubmit = () => onTextSubmit(text);
 
   return (
     <div className="upload-section">
