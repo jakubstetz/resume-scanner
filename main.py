@@ -43,18 +43,16 @@ async def upload_resume(resume: UploadFile = File(...)):
 
 
 @app.post("/upload-job")
-async def upload_job(
-    file: UploadFile = File(None),
-    text: str = Form(None),
-):
+async def upload_job(job: UploadFile = File(...)):
     try:
-        job_text_extracted = extract_text(text)
-        return {"filename": file.filename, "content": job_text_extracted}
+        job_text_extracted = extract_text(job)
+        return {"filename": job.filename, "content": job_text_extracted}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        # Generic fallback (e.g. file encoding error)
-        raise HTTPException(status_code=500, detail="Unexpected error parsing job PDF.")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to process job PDF: {str(e)}"
+        )
 
 
 @app.post("/analyze")
