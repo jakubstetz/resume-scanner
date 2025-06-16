@@ -50,11 +50,11 @@ function App() {
     if (!file) return;
 
     const formData = new FormData();
-    formData.append(type, file);
+    formData.append("document", file);
 
     const capitalizedType = type.charAt(0).toUpperCase() + type.slice(1);
     try {
-      const api_response = await fetch(`${apiUrl}/upload-${type}`, {
+      const api_response = await fetch(`${apiUrl}/upload-document`, {
         method: "POST",
         body: formData,
       });
