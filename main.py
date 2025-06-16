@@ -33,25 +33,16 @@ def root():
     return {"message": "Resume Scanner API"}
 
 
-@app.post("/upload-resume")
-async def upload_resume(resume: UploadFile = File(...)):
+@app.post("/upload-document")
+async def upload_document(document: UploadFile = File(...)):
     try:
-        resume_text = extract_text(resume)
-        return {"filename": resume.filename, "content": resume_text}
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-
-@app.post("/upload-job")
-async def upload_job(job: UploadFile = File(...)):
-    try:
-        job_text_extracted = extract_text(job)
-        return {"filename": job.filename, "content": job_text_extracted}
+        text = extract_text(document)
+        return {"filename": document.filename, "content": text}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(
-            status_code=500, detail=f"Failed to process job PDF: {str(e)}"
+            status_code=500, detail=f"Failed to process document: {str(e)}"
         )
 
 
