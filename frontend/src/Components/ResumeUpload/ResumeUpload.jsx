@@ -9,7 +9,7 @@ function ResumeUpload({ uploadHandler, uploaded, filename, clearTrigger }) {
         type="file"
         className="file-input"
         onChange={uploadHandler}
-        key={clearTrigger ? "clear" : "normal"}
+        key={`resume-${clearTrigger ? "version-1" : "version-2"}`}
       />
       <div style={{ minHeight: 24, display: "flex", alignItems: "center" }}>
         {uploaded ? (

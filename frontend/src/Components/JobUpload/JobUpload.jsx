@@ -28,7 +28,7 @@ function JobUpload({
         type="file"
         className="file-input"
         onChange={uploadHandler}
-        key={`file-${clearTrigger ? "clear" : "normal"}`}
+        key={`job-${clearTrigger ? "version-1" : "version-2"}`}
       />
       <textarea
         ref={textAreaRef}
@@ -36,7 +36,7 @@ function JobUpload({
         className="text-input"
         value={text}
         onChange={handleTextChange}
-        key={`text-${clearTrigger ? "clear" : "normal"}`}
+        key={`text-${clearTrigger ? "version-1" : "version-2"}`}
       />
       <button
         type="button"
