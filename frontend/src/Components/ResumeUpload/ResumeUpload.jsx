@@ -1,10 +1,24 @@
 import { motion } from "motion/react";
+import { useRef, useEffect } from "react";
 
-function ResumeUpload({ uploadHandler, uploaded, filename }) {
+function ResumeUpload({ uploadHandler, uploaded, filename, clearTrigger }) {
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  }, [clearTrigger]);
   return (
     <div className="upload-section">
       <h2>Resume Upload</h2>
-      <input type="file" className="file-input" onChange={uploadHandler} />
+      <input
+        ref={fileInputRef}
+        type="file"
+        className="file-input"
+        onChange={uploadHandler}
+        key={clearTrigger ? "clear" : "normal"}
+      />
       <div style={{ minHeight: 24, display: "flex", alignItems: "center" }}>
         {uploaded ? (
           <motion.span

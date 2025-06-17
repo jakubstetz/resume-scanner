@@ -28,6 +28,7 @@ function App() {
   });
   const [analysisResults, setAnalysisResults] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [clearTrigger, setClearTrigger] = useState(false);
 
   /*
   useEffect(() => {
@@ -102,6 +103,29 @@ function App() {
     );
   };
 
+  const clearSubmissions = () => {
+    setResumeUploaded(false);
+    setResume({
+      file: {
+        filename: "",
+        content: "",
+      },
+    });
+    setJobUploaded(false);
+    setJobTextUploaded(false);
+    setJob({
+      file: {
+        filename: "",
+        content: "",
+      },
+      text: {
+        content: "",
+      },
+    });
+    setClearTrigger((prev) => !prev);
+    toast.success("Inputs cleared successfully!");
+  };
+
   const analyzeHandler = async () => {
     try {
       // For now, prioritize file content over text content
@@ -141,6 +165,7 @@ function App() {
         }
         uploaded={resumeUploaded}
         filename={resume.file.filename}
+        clearTrigger={clearTrigger}
       />
       <JobUpload
         uploadHandler={(e) => uploadHandler(e, "job", setJobUploaded, setJob)}
@@ -148,7 +173,15 @@ function App() {
         textUploaded={jobTextUploaded}
         filename={job.file.filename}
         onTextSubmit={handleJobTextSubmit}
+        clearTrigger={clearTrigger}
       />
+      <button
+        className="clear-button"
+        onClick={clearSubmissions}
+        disabled={!(resumeUploaded || jobUploaded || jobTextUploaded)}
+      >
+        Clear Submissions
+      </button>
       <button
         className="analyze-button"
         disabled={!(resumeUploaded && (jobUploaded || jobTextUploaded))}

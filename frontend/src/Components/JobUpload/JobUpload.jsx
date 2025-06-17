@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "motion/react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 function JobUpload({
   uploadHandler,
@@ -7,8 +7,20 @@ function JobUpload({
   filename,
   onTextSubmit,
   textUploaded,
+  clearTrigger,
 }) {
   const [text, setText] = useState("");
+  const fileInputRef = useRef(null);
+  const textAreaRef = useRef(null);
+
+  useEffect(() => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+    if (textAreaRef.current) {
+      setText("");
+    }
+  }, [clearTrigger]);
 
   const handleTextChange = (e) => setText(e.target.value);
   const handleTextSubmit = () => onTextSubmit(text);
@@ -16,12 +28,20 @@ function JobUpload({
   return (
     <div className="upload-section">
       <h2>Job Description Upload</h2>
-      <input type="file" className="file-input" onChange={uploadHandler} />
+      <input
+        ref={fileInputRef}
+        type="file"
+        className="file-input"
+        onChange={uploadHandler}
+        key={`file-${clearTrigger ? "clear" : "normal"}`}
+      />
       <textarea
+        ref={textAreaRef}
         placeholder="Or paste job description here..."
         className="text-input"
         value={text}
         onChange={handleTextChange}
+        key={`text-${clearTrigger ? "clear" : "normal"}`}
       />
       <button
         type="button"
