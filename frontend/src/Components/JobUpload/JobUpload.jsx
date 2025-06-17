@@ -10,13 +10,9 @@ function JobUpload({
   clearTrigger,
 }) {
   const [text, setText] = useState("");
-  const fileInputRef = useRef(null);
   const textAreaRef = useRef(null);
 
   useEffect(() => {
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
     if (textAreaRef.current) {
       setText("");
     }
@@ -29,7 +25,6 @@ function JobUpload({
     <div className="upload-section">
       <h2>Job Description Upload</h2>
       <input
-        ref={fileInputRef}
         type="file"
         className="file-input"
         onChange={uploadHandler}
