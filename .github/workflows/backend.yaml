@@ -34,7 +34,8 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} << EOF
             cd resume-scanner
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
 
             rm -rf frontend
 
