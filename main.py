@@ -7,6 +7,7 @@ and includes any routers or middleware for the application.
 
 # .env specifies allowed CORS origins and which AI models to use.
 from dotenv import load_dotenv
+
 load_dotenv()
 
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Body
@@ -26,45 +27,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/")
 def root():
     return {"message": "Resume Scanner API"}
 
 
-@app.post("/upload-resume")
-async def upload_resume(resume: UploadFile = File(...)):
+@app.post("/upload-document")
+async def upload_document(document: UploadFile = File(...)):
     try:
-        resume_text = extract_text(resume)
-        return {"filename": resume.filename, "content": resume_text}
+        text = extract_text(document)
+        return {"filename": document.filename, "content": text}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-
-
-@app.post("/upload-job")
-async def upload_job(
-    job: UploadFile = File(None),
-    job_text: str = Form(None),
-):
-    # File upload
-    if job:
-        try:
-            job_text_extracted = extract_text(job)
-            return {"filename": job.filename, "content": job_text_extracted}
-        except ValueError as e:
-            raise HTTPException(status_code=400, detail=str(e))
-        except Exception as e:
-            # Generic fallback (e.g. file encoding error)
-            raise HTTPException(status_code=500, detail="Unexpected error parsing job PDF.")
-    
-    # Text submission
-    elif job_text:
-        return {"filename": False, "content": job_text}
-    
-    # Neither
-    else:
+    except Exception as e:
         raise HTTPException(
-            status_code=422,
-            detail="Either a job file or pasted job text must be provided."
+            status_code=500, detail=f"Failed to process document: {str(e)}"
         )
 
 
@@ -75,7 +53,7 @@ async def analyze_resume(
 ):
     if not resume_text or not job_text:
         raise HTTPException(status_code=422, detail="Resume or job text is missing.")
-    
+
     try:
         skills = extract_skills(resume_text)
         similarity = compute_similarity(resume_text, job_text)

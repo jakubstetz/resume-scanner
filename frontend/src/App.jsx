@@ -10,17 +10,25 @@ const apiUrl = import.meta.env.VITE_API_URL;
 function App() {
   const [resumeUploaded, setResumeUploaded] = useState(false);
   const [resume, setResume] = useState({
-    filename: "",
-    content: "",
+    file: {
+      filename: "",
+      content: "",
+    },
   });
-  const [jobUploaded, setJobUploaded] = useState(false);
+  const [jobFileUploaded, setJobFileUploaded] = useState(false);
   const [jobTextUploaded, setJobTextUploaded] = useState(false);
   const [job, setJob] = useState({
-    filename: "",
-    content: "",
+    file: {
+      filename: "",
+      content: "",
+    },
+    text: {
+      content: "",
+    },
   });
   const [analysisResults, setAnalysisResults] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [clearTrigger, setClearTrigger] = useState(false);
 
   /*
   useEffect(() => {
@@ -43,11 +51,11 @@ function App() {
     if (!file) return;
 
     const formData = new FormData();
-    formData.append(type, file);
+    formData.append("document", file);
 
     const capitalizedType = type.charAt(0).toUpperCase() + type.slice(1);
     try {
-      const api_response = await fetch(`${apiUrl}/upload-${type}`, {
+      const api_response = await fetch(`${apiUrl}/upload-document`, {
         method: "POST",
         body: formData,
       });
@@ -56,7 +64,13 @@ function App() {
         const uploaded_object = await api_response.json();
         if (uploaded_object?.filename && uploaded_object?.content) {
           uploadedStateSetter(true);
-          contentStateSetter(uploaded_object);
+          contentStateSetter((prev) => ({
+            ...prev,
+            file: {
+              filename: uploaded_object.filename,
+              content: uploaded_object.content,
+            },
+          }));
           toast.success(`${capitalizedType} uploaded successfully!`);
         } else {
           toast.error(
@@ -74,14 +88,61 @@ function App() {
     }
   };
 
+  const handleJobTextSubmit = (text) => {
+    setJobTextUploaded(!!text.trim());
+    setJob((prev) => ({
+      ...prev,
+      text: {
+        content: text,
+      },
+    }));
+    toast.success(
+      text.trim()
+        ? "Job description text submitted successfully!"
+        : "Job description text cleared.",
+    );
+  };
+
+  const clearSubmissions = () => {
+    setResumeUploaded(false);
+    setResume({
+      file: {
+        filename: "",
+        content: "",
+      },
+    });
+    setJobFileUploaded(false);
+    setJobTextUploaded(false);
+    setJob({
+      file: {
+        filename: "",
+        content: "",
+      },
+      text: {
+        content: "",
+      },
+    });
+    setClearTrigger((prev) => !prev);
+    toast.success("Inputs cleared successfully!");
+  };
+
+  // Effect to validate JD input
+  useEffect(() => {
+    if (jobFileUploaded && jobTextUploaded) {
+      toast.error("Please upload either a JD file or paste text, not both.");
+    }
+  }, [jobFileUploaded, jobTextUploaded]);
+
   const analyzeHandler = async () => {
     try {
+      const jobContent = jobFileUploaded ? job.file.content : job.text.content;
+
       const api_response = await fetch(`${apiUrl}/analyze`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          resume_text: resume.content,
-          job_text: job.content,
+          resume_text: resume.file.content,
+          job_text: jobContent,
         }),
       });
 
@@ -101,36 +162,6 @@ function App() {
     }
   };
 
-  const handleJobTextSubmit = async (text) => {
-    try {
-      const api_response = await fetch(`${apiUrl}/upload-job`, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ job_text: text }),
-      });
-      if (api_response.ok) {
-        const uploaded_object = await api_response.json();
-        if (uploaded_object?.content) {
-          setJobTextUploaded(true);
-          setJob((prev) => ({
-            ...prev,
-            content: uploaded_object.content,
-          }));
-          toast.success("Job description text submitted successfully!");
-        } else {
-          toast.error("Job text submission failed: Malformed API response.");
-        }
-      } else {
-        const error = await api_response.json();
-        console.log(error);
-        toast.error("Job text submission failed.");
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("An error occurred during job text submission.");
-    }
-  };
-
   return (
     <div className="app-container">
       <Toaster />
@@ -139,18 +170,33 @@ function App() {
           uploadHandler(e, "resume", setResumeUploaded, setResume)
         }
         uploaded={resumeUploaded}
-        filename={resume.filename}
+        filename={resume.file.filename}
+        clearTrigger={clearTrigger}
       />
       <JobUpload
-        uploadHandler={(e) => uploadHandler(e, "job", setJobUploaded, setJob)}
-        uploaded={jobUploaded}
+        uploadHandler={(e) =>
+          uploadHandler(e, "job", setJobFileUploaded, setJob)
+        }
+        uploaded={jobFileUploaded}
         textUploaded={jobTextUploaded}
-        filename={job.filename}
+        filename={job.file.filename}
         onTextSubmit={handleJobTextSubmit}
+        clearTrigger={clearTrigger}
       />
       <button
+        className="clear-button"
+        onClick={clearSubmissions}
+        disabled={!(resumeUploaded || jobFileUploaded || jobTextUploaded)}
+      >
+        Clear Submissions
+      </button>
+      <button
         className="analyze-button"
-        disabled={!(resumeUploaded && (jobUploaded || jobTextUploaded))}
+        disabled={
+          !resumeUploaded ||
+          !(jobFileUploaded || jobTextUploaded) ||
+          (jobFileUploaded && jobTextUploaded)
+        }
         onClick={analyzeHandler}
       >
         Analyze
