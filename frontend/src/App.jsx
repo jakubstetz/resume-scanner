@@ -15,7 +15,7 @@ function App() {
       content: "",
     },
   });
-  const [jobUploaded, setJobUploaded] = useState(false);
+  const [jobFileUploaded, setJobFileUploaded] = useState(false);
   const [jobTextUploaded, setJobTextUploaded] = useState(false);
   const [job, setJob] = useState({
     file: {
@@ -111,7 +111,7 @@ function App() {
         content: "",
       },
     });
-    setJobUploaded(false);
+    setJobFileUploaded(false);
     setJobTextUploaded(false);
     setJob({
       file: {
@@ -126,10 +126,16 @@ function App() {
     toast.success("Inputs cleared successfully!");
   };
 
+  // Effect to validate JD input
+  useEffect(() => {
+    if (jobFileUploaded && jobTextUploaded) {
+      toast.error("Please upload either a JD file or paste text, not both.");
+    }
+  }, [jobFileUploaded, jobTextUploaded]);
+
   const analyzeHandler = async () => {
     try {
-      // For now, prioritize file content over text content
-      const jobContent = job.file.content || job.text.content;
+      const jobContent = jobFileUploaded ? job.file.content : job.text.content;
 
       const api_response = await fetch(`${apiUrl}/analyze`, {
         method: "POST",
@@ -168,8 +174,10 @@ function App() {
         clearTrigger={clearTrigger}
       />
       <JobUpload
-        uploadHandler={(e) => uploadHandler(e, "job", setJobUploaded, setJob)}
-        uploaded={jobUploaded}
+        uploadHandler={(e) =>
+          uploadHandler(e, "job", setJobFileUploaded, setJob)
+        }
+        uploaded={jobFileUploaded}
         textUploaded={jobTextUploaded}
         filename={job.file.filename}
         onTextSubmit={handleJobTextSubmit}
@@ -178,13 +186,17 @@ function App() {
       <button
         className="clear-button"
         onClick={clearSubmissions}
-        disabled={!(resumeUploaded || jobUploaded || jobTextUploaded)}
+        disabled={!(resumeUploaded || jobFileUploaded || jobTextUploaded)}
       >
         Clear Submissions
       </button>
       <button
         className="analyze-button"
-        disabled={!(resumeUploaded && (jobUploaded || jobTextUploaded))}
+        disabled={
+          !resumeUploaded ||
+          !(jobFileUploaded || jobTextUploaded) ||
+          (jobFileUploaded && jobTextUploaded)
+        }
         onClick={analyzeHandler}
       >
         Analyze
