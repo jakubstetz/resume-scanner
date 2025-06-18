@@ -51,13 +51,14 @@ function JobUpload({
           {uploaded && textUploaded ? (
             <motion.span
               key="both"
-              className="upload-status"
+              className="upload-status-warning"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
             >
-              ✅ Both file ({filename}) and text submitted
+              ⚠️ Both file ({filename}) and text submitted — choose only one to
+              submit
             </motion.span>
           ) : uploaded ? (
             <motion.span

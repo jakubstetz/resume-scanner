@@ -114,10 +114,18 @@ input::file-selector-button:active {
   resize: vertical;
 }
 
-.upload-status {
+.upload-status,
+.upload-status-warning {
   display: block;
   margin-top: 0.5rem;
+}
+
+.upload-status {
   color: #22c55e;
+}
+
+.upload-status-warning {
+  color: #f59e0b;
 }
 
 .analyze-button,
