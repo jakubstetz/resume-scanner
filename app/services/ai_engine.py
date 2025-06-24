@@ -42,7 +42,7 @@ ner_pipeline = pipeline(
 # --- Skill extraction using NER ---
 def extract_skills(text: str) -> list[dict]:
     """
-    Extracts named entities from résumé text using a pretrained NER model.
+    Extracts named entities from text using a pretrained NER model.
     Returns a list of entities with labels and confidence scores.
     """
     logger.debug(f"Extracting skills from text (length: {len(text)})")

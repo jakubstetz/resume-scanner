@@ -68,7 +68,7 @@ async def upload_document(document: UploadFile = File(...)):
 
 
 @app.post("/analyze")
-async def analyze_resume(
+async def analyze(
     request: Request,
     resume_text: str = Body(...),
     job_text: str = Body(...),
@@ -85,15 +85,23 @@ async def analyze_resume(
 
     try:
         start_time = datetime.now()
-        skills = extract_skills(resume_text)
+        resume_skills = extract_skills(resume_text)
+        job_skills = extract_skills(job_text)
         process_time = (datetime.now() - start_time).total_seconds()
         logger.info(
-            f"Analysis completed in {process_time:.2f}s. Skills found: {len(skills)}"
+            f"Analysis completed in {process_time:.2f}s. {len(resume_skills)} skills found in resume, {len(job_skills)} skills found in job description."
         )
 
-        if not skills:
-            logger.warning("No skills extracted from the resume")
+        if not resume_skills:
+            logger.warning("No skills extracted from resume")
+        if not job_skills:
+            logger.warning("No skills extracted from job description")
+
         similarity = compute_similarity(resume_text, job_text)
-        return {"skills": skills, "similarity": similarity}
+        return {
+            "resumeSkills": resume_skills,
+            "jobSkills": job_skills,
+            "similarity": similarity,
+        }
     except ValueError as e:
         raise HTTPException(status_code=500, detail=str(e))
