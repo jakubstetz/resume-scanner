@@ -29,6 +29,7 @@ function App() {
   const [analysisResults, setAnalysisResults] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [clearTrigger, setClearTrigger] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   /*
   useEffect(() => {
@@ -134,6 +135,7 @@ function App() {
   }, [jobFileUploaded, jobTextUploaded]);
 
   const analyzeHandler = async () => {
+    setIsAnalyzing(true);
     try {
       const jobContent = jobFileUploaded ? job.file.content : job.text.content;
 
@@ -159,6 +161,8 @@ function App() {
     } catch (err) {
       console.error("Error during analysis:", err);
       toast.error("An error occurred during analysis.");
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
@@ -195,11 +199,19 @@ function App() {
         disabled={
           !resumeUploaded ||
           !(jobFileUploaded || jobTextUploaded) ||
-          (jobFileUploaded && jobTextUploaded)
+          (jobFileUploaded && jobTextUploaded) ||
+          isAnalyzing
         }
         onClick={analyzeHandler}
       >
-        Analyze
+        {isAnalyzing ? (
+          <>
+            <span className="spinner"></span>
+            Analyzing...
+          </>
+        ) : (
+          "Analyze"
+        )}
       </button>
       {showResults && <Analysis analysisResults={analysisResults} />}
     </div>
