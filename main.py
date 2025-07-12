@@ -16,7 +16,8 @@ import os
 from datetime import datetime
 
 from app.services.pdf_parser import extract_text
-from app.services.ai_engine import extract_skills, compute_similarity
+from app.services.ner_service import extract_skills
+from app.services.similarity_service import compute_similarity
 from app.logging_config import setup_logging
 
 # Setup logging
