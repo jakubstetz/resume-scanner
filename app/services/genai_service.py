@@ -9,7 +9,7 @@ job descriptions.
 import logging
 import os
 from typing import List
-import openai
+from openai import OpenAI
 from transformers import pipeline
 import torch
 
@@ -49,19 +49,20 @@ if use_lightweight_models or not openai_api_key:
                 "temperature"
             ],  # Match OpenAI config for consistency
             truncation=True,  # Apply truncation at tokenizer level for safety
-            return_full_text=False,  # Only return generated text, not input prompt
         )
         use_openai = False
+        openai_client = None
         logger.debug(f"Loaded local GenAI model: {genai_model_name}")
     except Exception as e:
         logger.error(f"Failed to load local GenAI model: {str(e)}")
         # Graceful degradation: if model loading fails, we can still provide basic responses
         genai_pipeline = None
         use_openai = False
+        openai_client = None
 else:
     # CLOUD API PATH: When we have API access and want best quality
     logger.info("Using OpenAI API for full-powered GenAI functionality")
-    openai.api_key = openai_api_key  # Authenticate with OpenAI service
+    openai_client = OpenAI(api_key=openai_api_key)  # Modern client instantiation
     use_openai = True
     genai_pipeline = None  # Don't load local model if using API
 
@@ -72,15 +73,14 @@ def _call_openai_api(prompt: str) -> str:
     Makes a call to OpenAI's API with error handling.
     """
     try:
-        # ChatCompletion API expects messages in a specific format
-        # Each message has a "role" (system, user, assistant) and "content"
-        response = openai.ChatCompletion.create(
+        # Modern chat completions API with client instance
+        response = openai_client.chat.completions.create(
             model=OPENAI_CONFIG["model"],
             messages=[{"role": "user", "content": prompt}],  # Simple user prompt
             max_tokens=OPENAI_CONFIG["max_tokens"],
             temperature=OPENAI_CONFIG["temperature"],
         )
-        # API returns multiple potential responses ("choices") - we take the first one
+        # Modern API response format
         return response.choices[0].message.content.strip()
     except Exception as e:
         logger.error(f"OpenAI API call failed: {str(e)}")
@@ -107,13 +107,11 @@ def _call_local_model(
                 max_length=max_length,
                 num_return_sequences=1,  # Generate one response (could generate multiple)
                 do_sample=True,  # Use sampling for more varied responses
-                # Note: truncation and return_full_text are set at pipeline level
             )
 
-        # With return_full_text=False, we get only the generated content
-        # No need for manual prompt trimming or string manipulation
+        # For text2text-generation models, the output format is different
+        # The response is a list of dictionaries with 'generated_text' key
         if isinstance(outputs, list) and len(outputs) > 0:
-            # Handle both single output and list format
             result = outputs[0].get("generated_text", "").strip()
         else:
             result = str(outputs).strip() if outputs else ""
