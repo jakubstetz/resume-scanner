@@ -116,7 +116,7 @@ async def analyze(
 @app.post("/summarize-resume")
 async def summarize_resume_endpoint(
     request: Request,
-    resume_text: str = Body(...),
+    resume_text: str = Body(..., embed=True),
 ):
     client_ip = request.client.host if request.client else "unknown"
     logger.info(
@@ -155,7 +155,7 @@ async def summarize_resume_endpoint(
 @app.post("/generate-recommendations")
 async def generate_recommendations_endpoint(
     request: Request,
-    resume_text: str = Body(...),
+    resume_text: str = Body(..., embed=True),
 ):
     client_ip = request.client.host if request.client else "unknown"
     logger.info(
