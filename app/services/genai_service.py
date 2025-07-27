@@ -205,7 +205,7 @@ def summarize_resume(text: str) -> str:
         raise ValueError("Résumé text too short for meaningful summarization")
 
     # PROMPT ENGINEERING: Structure the request for optimal results
-    prompt = f"""Please provide a concise professional summary of this résumé in 2-3 sentences, highlighting the candidate's key qualifications, experience level, and main skills:
+    prompt = f"""Please provide a concise professional summary of this résumé in 2-4 sentences, highlighting the candidate's key qualifications, experience level, and main skills:
 
 {text[:3000]}  # Truncate to manage token limits and costs
 
@@ -215,7 +215,7 @@ Summary:"""  # This trailing prompt helps focus the model's response
         result = (
             _call_openai_api(prompt)
             if use_openai
-            else _call_local_model(prompt, max_length=200)
+            else _call_local_model(prompt, max_length=250)
         )
 
         logger.info(f"Generated résumé summary (length: {len(result)})")
@@ -237,17 +237,31 @@ def generate_recommendations(text: str) -> List[str]:
         raise ValueError("Résumé text too short for meaningful recommendations")
 
     # SIMPLIFIED PROMPT: Let the model use its natural formatting, parse robustly afterward
-    prompt = f"""Analyze this résumé and provide 5-7 specific, actionable recommendations for improvement. Focus on content, structure, and presentation:
+    prompt = f"""
+Analyze this résumé and provide 3–5 specific, high-value, actionable recommendations for improvement.
 
+⚠️ Important context:
+This résumé is already well-formatted. It includes:
+- A professional summary at the top
+- Bullet points for each role
+- A categorized skills section
+- Clear section headers and consistent styling
+
+So, do **not** suggest formatting improvements or general layout tips.
+
+Instead, focus on **content quality**, **wording**, **missing qualifications**, or **opportunities to better align with technical roles**.
+
+Résumé:
 {text[:3000]}
 
-Please provide specific recommendations in list format:"""
+Please provide your recommendations in list format:
+- """  # Prime the response format
 
     try:
         result = (
             _call_openai_api(prompt)
             if use_openai
-            else _call_local_model(prompt, max_length=400)
+            else _call_local_model(prompt, max_length=370)
         )
 
         # POST-PROCESSING: Let robust parser handle whatever format the model returned
@@ -289,13 +303,14 @@ RÉSUMÉ:
 {resume_text[:5000]}
 
 ANALYSIS:
-Key discrepancies and gaps:"""  # Prime the response format
+Key discrepancies and gaps:
+- """  # Prime the response format
 
     try:
         result = (
             _call_openai_api(prompt)
             if use_openai
-            else _call_local_model(prompt, max_length=500)
+            else _call_local_model(prompt, max_length=420)
         )
 
         logger.info(f"Generated discrepancy analysis (length: {len(result)})")
