@@ -16,7 +16,13 @@ import os
 from datetime import datetime
 
 from app.services.pdf_parser import extract_text
-from app.services.ai_engine import extract_skills, compute_similarity
+from app.services.ner_service import extract_skills
+from app.services.similarity_service import compute_similarity
+from app.services.genai_service import (
+    summarize_resume,
+    generate_recommendations,
+    analyze_discrepancies,
+)
 from app.logging_config import setup_logging
 
 # Setup logging
@@ -105,3 +111,126 @@ async def analyze(
         }
     except ValueError as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/summarize-resume")
+async def summarize_resume_endpoint(
+    request: Request,
+    resume_text: str = Body(..., embed=True),
+):
+    client_ip = request.client.host if request.client else "unknown"
+    logger.info(
+        f"Resume summarization request from {client_ip}. "
+        f"Resume length: {len(resume_text)} chars"
+    )
+
+    if not resume_text:
+        logger.warning("Missing resume text in summarization request")
+        raise HTTPException(status_code=422, detail="Resume text is required.")
+
+    try:
+        start_time = datetime.now()
+        summary = summarize_resume(resume_text)
+        process_time = (datetime.now() - start_time).total_seconds()
+
+        logger.info(
+            f"Resume summarization completed in {process_time:.2f}s. "
+            f"Summary length: {len(summary)} chars"
+        )
+        return {"summary": summary}
+
+    except ValueError as e:
+        logger.error(f"Resume summarization validation error: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(
+            f"Unexpected error during resume summarization: {str(e)}", exc_info=True
+        )
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to generate resume summary. Please try again.",
+        )
+
+
+@app.post("/generate-recommendations")
+async def generate_recommendations_endpoint(
+    request: Request,
+    resume_text: str = Body(..., embed=True),
+):
+    client_ip = request.client.host if request.client else "unknown"
+    logger.info(
+        f"Recommendations request from {client_ip}. "
+        f"Resume length: {len(resume_text)} chars"
+    )
+
+    if not resume_text:
+        logger.warning("Missing resume text in recommendations request")
+        raise HTTPException(status_code=422, detail="Resume text is required.")
+
+    try:
+        start_time = datetime.now()
+        recommendations = generate_recommendations(resume_text)
+        process_time = (datetime.now() - start_time).total_seconds()
+
+        logger.info(
+            f"Recommendations generation completed in {process_time:.2f}s. "
+            f"Generated {len(recommendations)} recommendations"
+        )
+        return {"recommendations": recommendations}
+
+    except ValueError as e:
+        logger.error(
+            f"Recommendations generation validation error: {str(e)}", exc_info=True
+        )
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(
+            f"Unexpected error during recommendations generation: {str(e)}",
+            exc_info=True,
+        )
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to generate recommendations. Please try again.",
+        )
+
+
+@app.post("/analyze-discrepancies")
+async def analyze_discrepancies_endpoint(
+    request: Request,
+    resume_text: str = Body(...),
+    job_text: str = Body(...),
+):
+    client_ip = request.client.host if request.client else "unknown"
+    logger.info(
+        f"Discrepancy analysis request from {client_ip}. "
+        f"Resume length: {len(resume_text)} chars, Job description length: {len(job_text)} chars"
+    )
+
+    if not resume_text or not job_text:
+        logger.warning("Missing resume or job text in discrepancy analysis request")
+        raise HTTPException(
+            status_code=422,
+            detail="Both resume and job description texts are required.",
+        )
+
+    try:
+        start_time = datetime.now()
+        discrepancies = analyze_discrepancies(resume_text, job_text)
+        process_time = (datetime.now() - start_time).total_seconds()
+
+        logger.info(
+            f"Discrepancy analysis completed in {process_time:.2f}s. "
+            f"Analysis length: {len(discrepancies)} chars"
+        )
+        return {"discrepancies": discrepancies}
+
+    except ValueError as e:
+        logger.error(f"Discrepancy analysis validation error: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(
+            f"Unexpected error during discrepancy analysis: {str(e)}", exc_info=True
+        )
+        raise HTTPException(
+            status_code=500, detail="Failed to analyze discrepancies. Please try again."
+        )

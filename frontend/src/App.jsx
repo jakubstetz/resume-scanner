@@ -27,8 +27,10 @@ function App() {
     },
   });
   const [analysisResults, setAnalysisResults] = useState(false);
+  const [genAIResults, setGenAIResults] = useState(null);
   const [showResults, setShowResults] = useState(false);
   const [clearTrigger, setClearTrigger] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   /*
   useEffect(() => {
@@ -133,32 +135,120 @@ function App() {
     }
   }, [jobFileUploaded, jobTextUploaded]);
 
+  // Helper function for API calls
+  const postJson = async (endpoint, body) => {
+    try {
+      const response = await fetch(`${apiUrl}${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return { ok: true, data };
+      } else {
+        const error = await response.json();
+        return { ok: false, error };
+      }
+    } catch (err) {
+      return { ok: false, error: err };
+    }
+  };
+
   const analyzeHandler = async () => {
+    setIsAnalyzing(true);
     try {
       const jobContent = jobFileUploaded ? job.file.content : job.text.content;
 
-      const api_response = await fetch(`${apiUrl}/analyze`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      // Call all endpoints in parallel for better performance
+      const [
+        analysisResult,
+        summaryResult,
+        recommendationsResult,
+        discrepanciesResult,
+      ] = await Promise.all([
+        postJson("/analyze", {
           resume_text: resume.file.content,
           job_text: jobContent,
         }),
-      });
+        postJson("/summarize-resume", { resume_text: resume.file.content }),
+        postJson("/generate-recommendations", {
+          resume_text: resume.file.content,
+        }),
+        postJson("/analyze-discrepancies", {
+          resume_text: resume.file.content,
+          job_text: jobContent,
+        }),
+      ]);
 
-      if (api_response.ok) {
-        const results = await api_response.json();
-        setAnalysisResults(results);
+      // Check if all requests were successful
+      if (
+        analysisResult.ok &&
+        summaryResult.ok &&
+        recommendationsResult.ok &&
+        discrepanciesResult.ok
+      ) {
+        setAnalysisResults(analysisResult.data);
+        setGenAIResults({
+          summary: summaryResult.data.summary,
+          recommendations: recommendationsResult.data.recommendations,
+          discrepancies: discrepanciesResult.data.discrepancies,
+        });
         setShowResults(true);
         toast.success("Analysis completed successfully!");
       } else {
-        const error = await api_response.json();
-        console.error("Analysis failed:", error);
-        toast.error("Analysis failed.");
+        // Handle partial failures
+        let analysisResults = null;
+        let genAIResults = {};
+
+        if (analysisResult.ok) {
+          analysisResults = analysisResult.data;
+          setAnalysisResults(analysisResults);
+        } else {
+          console.error("Basic analysis failed:", analysisResult.error);
+        }
+
+        if (summaryResult.ok) {
+          genAIResults.summary = summaryResult.data.summary;
+        } else {
+          console.error("Resume summary failed:", summaryResult.error);
+        }
+
+        if (recommendationsResult.ok) {
+          genAIResults.recommendations =
+            recommendationsResult.data.recommendations;
+        } else {
+          console.error("Recommendations failed:", recommendationsResult.error);
+        }
+
+        if (discrepanciesResult.ok) {
+          genAIResults.discrepancies = discrepanciesResult.data.discrepancies;
+        } else {
+          console.error(
+            "Discrepancies analysis failed:",
+            discrepanciesResult.error,
+          );
+        }
+
+        if (Object.keys(genAIResults).length > 0) {
+          setGenAIResults(genAIResults);
+        }
+
+        if (analysisResults || Object.keys(genAIResults).length > 0) {
+          setShowResults(true);
+          toast.success(
+            "Analysis completed with some warnings. Check console for details.",
+          );
+        } else {
+          toast.error("All analysis services failed.");
+        }
       }
     } catch (err) {
       console.error("Error during analysis:", err);
       toast.error("An error occurred during analysis.");
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
@@ -195,13 +285,26 @@ function App() {
         disabled={
           !resumeUploaded ||
           !(jobFileUploaded || jobTextUploaded) ||
-          (jobFileUploaded && jobTextUploaded)
+          (jobFileUploaded && jobTextUploaded) ||
+          isAnalyzing
         }
         onClick={analyzeHandler}
       >
-        Analyze
+        {isAnalyzing ? (
+          <>
+            <span className="spinner"></span>
+            Analyzing...
+          </>
+        ) : (
+          "Analyze"
+        )}
       </button>
-      {showResults && <Analysis analysisResults={analysisResults} />}
+      {showResults && (
+        <Analysis
+          analysisResults={analysisResults}
+          genAIResults={genAIResults}
+        />
+      )}
     </div>
   );
 }

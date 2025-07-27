@@ -1,69 +1,31 @@
 """
-Provides core AI functionality for résumé analysis.
+Provides semantic similarity scoring functionality for résumé-JD comparison.
 
-This module is responsible for loading pretrained models and performing
-inference tasks such as skill extraction, named entity recognition, and
-semantic similarity between résumé content and job descriptions.
+This module is responsible for loading pretrained sentence transformer models
+and computing similarity between résumé content and job descriptions.
 """
 
 import logging
-from transformers import pipeline
 from sentence_transformers import SentenceTransformer
-import torch
 import numpy as np
 import os
-from app.utils import filter_skill_entities, sanitize_entity
 
 # Set up logging
 logger = logging.getLogger(__name__)
 
-# --- Load models once at module level ---
+# --- Load similarity model once at module level ---
 # Use lightweight models if specified in environment
 use_lightweight_models = os.getenv("LIGHTWEIGHT_MODELS", "false").lower() == "true"
 
 if use_lightweight_models:  # Used primarily for demo hosting with constrained resources
-    logger.info("Using lightweight models for constrained environments")
-    ner_model_name = "dslim/bert-base-NER"
+    logger.info("Using lightweight similarity model for constrained environments")
     similarity_model_name = "sentence-transformers/all-MiniLM-L6-v2"
 else:  # Full-powered local development or production
-    logger.info("Using full-powered models")
-    ner_model_name = "Jean-Baptiste/roberta-large-ner-english"
+    logger.info("Using full-powered similarity model")
     similarity_model_name = "sentence-transformers/all-MiniLM-L6-v2"
 
 logger.debug(f"Loading similarity model: {similarity_model_name}")
 similarity_model = SentenceTransformer(similarity_model_name)
-
-logger.debug(f"Loading NER model: {ner_model_name}")
-ner_pipeline = pipeline(
-    "ner", model=ner_model_name, tokenizer=ner_model_name, grouped_entities=True
-)
-
-
-# --- Skill extraction using NER ---
-def extract_skills(text: str) -> list[dict]:
-    """
-    Extracts named entities from text using a pretrained NER model.
-    Returns a list of entities with labels and confidence scores.
-    """
-    logger.debug(f"Extracting skills from text (length: {len(text)})")
-
-    try:
-        # No gradients since we are doing inference, not training.
-        with torch.no_grad():
-            logger.debug("Running NER pipeline...")
-            raw_entities = ner_pipeline(text)
-
-        logger.debug(f"Found {len(raw_entities)} raw entities")
-        filtered_entities = filter_skill_entities(raw_entities)
-        logger.debug(f"After filtering: {len(filtered_entities)} entities")
-
-        result = [sanitize_entity(e) for e in filtered_entities]
-        logger.info(f"Extracted {len(result)} skills from text")
-        return result
-
-    except Exception as e:
-        logger.error(f"Error in extract_skills: {str(e)}", exc_info=True)
-        raise ValueError(f"NER model inference failed: {str(e)}")
 
 
 # --- Semantic similarity scoring ---
