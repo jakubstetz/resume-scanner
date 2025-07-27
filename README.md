@@ -12,6 +12,8 @@ This project is an AI-powered résumé analyzer that compares a candidate’s r�
 - Upload a résumé (PDF) and a job description (PDF or pasted text)
 - Extracts relevant skills using Named Entity Recognition (NER)
 - Computes semantic similarity between résumé and job description
+- GenAI-powered resume summary and improvement recommendations
+- GenAI-powered gap analysis comparing résumé qualifications against job requirements
 - Displays results in a clean, dark-themed React interface
 - Optimized for lightweight or heavyweight models via `.env` toggle
 
@@ -30,6 +32,7 @@ This project is an AI-powered résumé analyzer that compares a candidate’s r�
 - **FastAPI** (Python) for API endpoints
 - **pdfplumber** for parsing résumé/job PDFs
 - **Transformers & Sentence-Transformers** for NER and semantic similarity
+- **OpenAI API** for generative AI analysis and recommendations
 - **Torch** for model inference
 - **CORS + dotenv** for secure, configurable deployments
 
@@ -59,6 +62,7 @@ echo "CORS_ORIGINS=http://localhost:5173" >> .env
 echo "NER_MODEL=dslim/bert-base-NER" >> .env
 echo "SIMILARITY_MODEL=sentence-transformers/all-MiniLM-L6-v2" >> .env
 echo "LIGHTWEIGHT_MODELS=true" >> .env
+echo "OPENAI_API_KEY=your_key_here" >> .env  # Optional: for enhanced GenAI features using OpenAI API
 
 # Run backend server
 uvicorn main:app --reload --port 8002
@@ -75,9 +79,12 @@ npm run dev
 
 ```
 ├── main.py               # FastAPI app entrypoint
-├── ai_engine.py          # AI logic: NER + similarity
-├── pdf_parser.py         # PDF text extraction
-├── utils.py              # Helper methods for serialization
+├── app/
+│   └── services/
+│       ├── genai_service.py      # AI-powered analysis & recommendations
+│       ├── ner_service.py        # Named Entity Recognition
+│       ├── similarity_service.py # Semantic similarity computation
+│       └── pdf_parser.py         # PDF text extraction
 ├── requirements.txt      # Python dependencies
 ├── Dockerfile            # Production container setup
 ```
